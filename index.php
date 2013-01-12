@@ -39,13 +39,6 @@ function fotorama_mso_options()
                             'description' => t('Укажите высоту Фоторамы (в пикселях или процентах)'),
                             'default' => '400'
                         ),
-            'fotorama_style' => array(
-                            'type' => 'select',
-                            'name' => t('Навигация по галерее'),
-                            'description' => t('Вместо миниатюр можно показывать точки'),
-                            'values' => t('1||Точки #2||Миниатюры'),
-                            'default' => '1'
-                        ),
             'fotorama_background' => array(
                             'type' => 'text',
                             'name' => t('Цвет заднего фона галереи'),
@@ -63,6 +56,39 @@ function fotorama_mso_options()
                             'name' => t('Сколько изображений предзагружать'),
                             'description' => t('Рекомендуется выбирать 0-2, экономьте трафик посетителей'),
                             'default' => "0"
+                        ),
+            'fotorama_style' => array(
+                            'type' => 'select',
+                            'name' => t('Навигация по галерее'),
+                            'description' => t('Вместо миниатюр можно показывать точки'),
+                            'values' => t('1||Точки #2||Миниатюры'),
+                            'default' => '1'
+                        ),
+            'fotorama_caption' => array(
+                            'type' => 'select',
+                            'name' => t('Отображение описания к изображениям'),
+                            'description' => t('Для корректного отображения подписей нужно модифицировать CSS шаблона'),
+                            'values' => t('simple ||Под изображением # overlay ||Поверх изображения # none||Не отображать'),
+                            'default' => 'none'
+                        ),
+            'fotorama_transition' => array(
+                            'type' => 'select',
+                            'name' => t('Тип перехода между изображениями'),
+                            'description' => t(''),
+                            'values' => t('slide ||Скольжение # fade ||Исчезание'),
+                            'default' => 'slide'
+                        ),
+            'fotorama_fullscreen' => array(
+                            'type' => 'checkbox',
+                            'name' => t('Отображать иконку перехода в полноэкранный режим'),
+                            'description' => t(''),
+                            'default' => '1'
+                        ),
+            'fotorama_hash' => array(
+                            'type' => 'checkbox',
+                            'name' => t('Позволять Фотораме менять адрес страницы, чтобы можно было послать ссылку на конкретное изображение'),
+                            'description' => t('Лучше всего если будет только одна Фоторама на странице'),
+                            'default' => '0'
                         ),
             ),
         t('Настройки плагина Фоторама'),
@@ -83,6 +109,10 @@ function fotorama_head($args = array())
     if(!isset($options['fotorama_background'])) $options['fotorama_background'] = '#252424';
     if(!isset($options['fotorama_preview_background'])) $options['fotorama_preview_background'] = '#252424';
     if(!isset($options['fotorama_preload'])) $options['fotorama_preload'] = '0';
+    if(!isset($options['fotorama_fullscreen'])) $options['fotorama_fullscreen'] = '1';
+    if(!isset($options['fotorama_hash'])) $options['fotorama_hash'] = '1';
+    if(!isset($options['fotorama_caption'])) $options['fotorama_caption'] = 'none';
+    if(!isset($options['fotorama_transition'])) $options['fotorama_transition'] = 'slide';
 
 	extract($options);
 
@@ -93,6 +123,7 @@ function fotorama_head($args = array())
 	echo <<<EOF
 	
 	<link rel="stylesheet" href="{$url}static/fotorama.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="{$url}static/fotorama_custom.css" type="text/css" media="screen">
 	<script src="${url}static/fotorama.js"></script>
 	<script>
 	$(function() {
@@ -103,6 +134,10 @@ function fotorama_head($args = array())
                                     background: "${fotorama_background}",
                                     navBackground: "${fotorama_preview_background}",
                                     preload: "${fotorama_preload}",
+                                    fullscreenIcon: ${fotorama_fullscreen},
+                                    hash: ${fotorama_hash},
+                                    caption: "${fotorama_caption}",
+                                    transition: "${fotorama_transition}",
                                 });
         });
     </script>
@@ -130,7 +165,7 @@ function fotorama_content($text = '')
 		
 		'~\[gallery\](.*?)\[\/gallery\]~si' => '<div class="gallery">$1</div>',
 		
-		'~\[gal=(.[^\s]*?) (.*?)\](.*?)\[\/gal\]~si' => '<a href="$3" title="$2"><img src="$1" alt="$2"></a>',
+		'~\[gal=(.[^\s]*?) (.*?)\](.*?)\[\/gal\]~si' => '<a href="$3" title="$2" alt="$2"><img src="$1" alt="$2"></a>',
 		
 		'~\[gal=(.*?)\](.*?)\[\/gal\]~si' => '<a href="$2"><img src="$1" alt=""></a>',
 		
