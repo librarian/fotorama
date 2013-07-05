@@ -1,0 +1,13 @@
+.fotorama__caption_overlay {
+    position:absolute;
+    bottom:8px;
+    left:8px;
+    font-size:16px;
+    color:#fff;
+}
+.fotorama__caption-outer {
+    position:relative;
+    bottom:8px;
+    left:8px;
+    font-size:16px;
+}
